@@ -1,0 +1,8 @@
+name: nf-mtg_diamond-0.9.22
+channels:
+  - default 
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=2.7
+  - bioconda::diamond=0.9.22
