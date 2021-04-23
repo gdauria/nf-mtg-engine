@@ -57,7 +57,17 @@ COLUMNS = Channel
         file(row.R2))}  
     .into { samples_channel; samples_channel_2 }
 
+/*
+process getDb {
+conda 'conda-forge::curl'
 
+script:
+"""
+curl 
+"""
+
+}
+*/
 
 process limpia {
 
@@ -216,7 +226,7 @@ diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/MTG/eggnog.dmnd -e $evalue
 process mapping {
 
 
-conda 'bioconda::bwa bioconda::samtools' 
+conda 'bioconda::bwa bioconda::samtools=1.9' 
 
 publishDir "${BASENAME}/mapping", mode: 'copy', pattern: '*.bam'
 
