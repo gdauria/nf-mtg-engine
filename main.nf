@@ -148,7 +148,7 @@ metaspades.py -1 concat.R1.fastq.gz -2 concat.R2.fastq.gz -o mtg_assembly -t ${T
 
 process prokka {
 
-conda "${projectDir}/envs/prokka1.14.5.yml"
+conda "${projectDir}/envs/prokka.yml"
 
 publishDir "${BASENAME}/prokka", mode: 'copy', pattern: '{prokka_out/*}'
 
