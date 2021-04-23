@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
 DBFOLDER     = params.DBFOLDER
-NEXTERAADAPT = "$DBFOLDER/QCFILES/IlluminaAdaptors.fasta"
-PHIX         = "$DBFOLDER/QCFILES/phix.fasta"
+NEXTERAADAPT = "${projectDir}/qcfolder/IlluminaAdaptors.fasta"
+PHIX         = "${projectDir}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
 MANIFEST     = params.manifest
 BASENAME     = params.bn
