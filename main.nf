@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
 DBFOLDER     = params.DBFOLDER
-NEXTERAADAPT = "${projectDir}/qcfolder/IlluminaAdaptors.fasta"
-PHIX         = "${projectDir}/qcfolder/phix.fasta"
+NEXTERAADAPT = "${DBFOLDER}/qcfolder/IlluminaAdaptors.fasta"
+PHIX         = "${DBFOLDER}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
 MANIFEST     = params.manifest
 BASENAME     = params.bn
@@ -16,6 +16,7 @@ MAX_LEN2     = params.MAX_LEN2
 evaluefun4   = params.evaluefun4
 minidenfun4  = params.minidenfun4
 blocksize    = params.blocksize
+evaluehmmer5 = params.evaluehmmer5
 
  
 println """\
@@ -43,7 +44,7 @@ Annotation
 - evaluefun4            : ${evaluefun4}
 - minidenfun4           : ${minidenfun4}
 - blocksize             : ${blocksize}
-
+- evaluefun5            : ${evaluehmmer5}
 
          """
          .stripIndent()
@@ -171,6 +172,7 @@ output:
 file("prokka_out/${BASENAME}.faa") into prokka_ch_1
 file("prokka_out/${BASENAME}.faa") into prokka_ch_2
 file("prokka_out/${BASENAME}.gff") into prokka_ch_3
+file("prokka_out/${BASENAME}.faa") into prokka_ch_4
 file("prokka_out/*")
 
 
@@ -196,7 +198,7 @@ file ("annotation.kegg.diamond") into kegg_channel
 script:
 """
 # KO
-diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/MTG/keggdb.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.kegg.diamond
+diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/keggdb.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.kegg.diamond
 """
 
 }
@@ -218,10 +220,31 @@ file ("annotation.cog.diamond") into cog_channel
 script:
 """
 # KO
-diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/MTG/eggnog.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.cog.diamond
+diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/eggnog.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.cog.diamond
 """
 
 }
+
+
+process annotationPfam {
+
+conda 'bioconda::hmmer'
+
+publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.pfam.hmm'
+
+input:
+file "FAA" from prokka_ch_4
+
+output:
+file ("annotation.pfam.hmm")
+
+script:
+"""
+hmmsearch --domtblout annotation.pfam.hmm -E ${evaluehmmer5} --cpu ${THREADS} ${DBFOLDER}/Pfam-A.hmm ${FAA}
+"""
+}
+
+
 
 process mapping {
 
