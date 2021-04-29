@@ -65,7 +65,7 @@ conda 'conda-forge::wget'
 publishDir "${DBFOLDER}/DBs/", mode: 'copy', pattern: '*.dmnd'
 
 output:
-file ("keggdb.dmnd")
+file ("keggdb.dmnd") into keggdb_ch
 
 script:
 """
@@ -195,6 +195,7 @@ publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.diamond'
 
 input:
 file "FAA" from prokka_ch_1
+file "KEGGDB" from keggdb_ch
 
 output:
 file ("annotation.kegg.diamond") into kegg_channel
@@ -202,7 +203,7 @@ file ("annotation.kegg.diamond") into kegg_channel
 script:
 """
 # KO
-diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/keggdb.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.kegg.diamond
+diamond blastp -q ${FAA} -p ${THREADS} -d ${KEGGDB} -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.kegg.diamond
 """
 
 }
