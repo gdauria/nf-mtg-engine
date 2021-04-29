@@ -250,7 +250,6 @@ hmmsearch --domtblout annotation.pfam.hmm -E ${evaluehmmer5} --cpu ${THREADS} ${
 }
 
 
-
 process mapping {
 
 
