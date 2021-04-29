@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-DBFOLDER     = $projectDir
+DBFOLDER     = workflow.projectDir
 NEXTERAADAPT = "${DBFOLDER}/qcfolder/IlluminaAdaptors.fasta"
 PHIX         = "${DBFOLDER}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
