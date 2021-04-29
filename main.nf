@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-DBFOLDER     = params.DBFOLDER
+DBFOLDER     = $NXF_ASSETS
 NEXTERAADAPT = "${DBFOLDER}/qcfolder/IlluminaAdaptors.fasta"
 PHIX         = "${DBFOLDER}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
