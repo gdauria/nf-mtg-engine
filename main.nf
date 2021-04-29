@@ -1,12 +1,12 @@
 #!/usr/bin/env nextflow
 
-DBFOLDER     = $NXF_ASSETS
+DBFOLDER     = $projectDir
 NEXTERAADAPT = "${DBFOLDER}/qcfolder/IlluminaAdaptors.fasta"
 PHIX         = "${DBFOLDER}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
 MANIFEST     = params.manifest
 BASENAME     = params.bn
-WORKFLOW     = forkflow.workDir
+WORKFLOW     = workflow.workDir
 
 WIN_SIZE     = params.WIN_SIZE       
 MEAN_QUAL    = params.MEAN_QUAL
