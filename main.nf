@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-DBFOLDER     = workflow.projectDir"/DBs"
+DBFOLDER     = workflow.projectDir
 NEXTERAADAPT = "${DBFOLDER}/qcfolder/IlluminaAdaptors.fasta"
 PHIX         = "${DBFOLDER}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
@@ -62,7 +62,7 @@ COLUMNS = Channel
 
 process getDb {
 conda 'conda-forge::wget'
-publishDir "${DBFOLDER}/", mode: 'copy', pattern: '*.dmnd'
+publishDir "${DBFOLDER}/DBs/", mode: 'copy', pattern: '*.dmnd'
 
 output:
 file ("keggdb.dmnd")
