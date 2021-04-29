@@ -6,7 +6,7 @@ PHIX         = "${DBFOLDER}/qcfolder/phix.fasta"
 THREADS      = params.THREADS
 MANIFEST     = params.manifest
 BASENAME     = params.bn
-
+WORKFLOW     = forkflow.workDir
 
 WIN_SIZE     = params.WIN_SIZE       
 MEAN_QUAL    = params.MEAN_QUAL
@@ -29,6 +29,7 @@ System parameters:
 - PHIX                  : ${PHIX}
 - THREADS               : ${THREADS}
 - PROJECTDIR            : $projectDir
+- WORKFLOW              : $WORKFLOW
 
 Project parameters:
 - BASENAME              : ${BASENAME}
