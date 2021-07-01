@@ -7,6 +7,7 @@ THREADS      = params.THREADS
 MANIFEST     = params.manifest
 BASENAME     = params.bn
 WORKFLOW     = workflow.workDir
+CACHEDIR     = params.CACHEDIR
 
 WIN_SIZE     = params.WIN_SIZE       
 MEAN_QUAL    = params.MEAN_QUAL
@@ -18,7 +19,6 @@ minidenfun4  = params.minidenfun4
 blocksize    = params.blocksize
 evaluehmmer5 = params.evaluehmmer5
 
- 
 println """\
 METAGENOMICS = +
 ===================================
@@ -30,6 +30,7 @@ System parameters:
 - THREADS               : ${THREADS}
 - PROJECTDIR            : $projectDir
 - WORKFLOW              : $WORKFLOW
+- CACHEDIR              : $CACHEDIR
 
 Project parameters:
 - BASENAME              : ${BASENAME}
@@ -60,18 +61,46 @@ COLUMNS = Channel
     .into { samples_channel; samples_channel_2 }
 
 
-process getDb {
-conda 'conda-forge::wget'
-publishDir "${DBFOLDER}/DBs/", mode: 'copy', pattern: '*.dmnd'
+process getKeggDb {
+storeDir "$CACHEDIR"
 
 output:
 file ("keggdb.dmnd") into keggdb_ch
 
 script:
 """
-wget --no-check-certificate https://atenea.fisabio.san.gva.es/syb/keggdb.dmnd
+curl --silent --insecure https://atenea.fisabio.san.gva.es/syb/keggdb.dmnd --output keggdb.dmnd
+#wget --no-check-certificate https://atenea.fisabio.san.gva.es/syb/keggdb.dmnd
 """
 }
+
+process getiEggnogDb {
+storeDir "$CACHEDIR"
+
+output:
+file ("eggnog.dmnd") into eggnogdb_ch
+
+script:
+"""
+curl --silent --insecure https://atenea.fisabio.san.gva.es/syb/eggnog.dmnd --output eggnog.dmnd
+#wget --no-check-certificate https://atenea.fisabio.san.gva.es/syb/keggdb.dmnd
+"""
+}
+
+
+process getPfamADb {
+storeDir "$CACHEDIR"
+
+output:
+file 'Pfam-A.hmm*' into pfamdb_ch
+
+script:
+"""
+curl --silent --insecure https://atenea.fisabio.san.gva.es/syb/Pfam-A.hmm --output Pfam-A.hmm
+curl --silent --insecure https://atenea.fisabio.san.gva.es/syb/Pfam-A.hmm.dat --output Pfam-A.hmm.dat
+"""
+}
+
 
 
 process limpia {
@@ -182,7 +211,7 @@ file("prokka_out/*")
 
 script: 
 """
-prokka contigs.fasta --outdir prokka_out --prefix ${BASENAME} > prokka.log
+prokka contigs.fasta --cpus ${THREADS} --outdir prokka_out --prefix ${BASENAME} > prokka.log
 """
 }
 
@@ -195,7 +224,7 @@ publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.diamond'
 
 input:
 file "FAA" from prokka_ch_1
-file "KEGGDB" from keggdb_ch
+/* file "KEGGDB" from keggdb_ch */
 
 output:
 file ("annotation.kegg.diamond") into kegg_channel
@@ -217,6 +246,7 @@ conda "${projectDir}/envs/diamond.yml"
 publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.diamond'
 
 input:
+file "eggnog.dmnd" from eggnogdb_ch
 file "FAA" from prokka_ch_2
 
 output:
@@ -225,7 +255,7 @@ file ("annotation.cog.diamond") into cog_channel
 script:
 """
 # KO
-diamond blastp -q ${FAA} -p ${THREADS} -d ${DBFOLDER}/eggnog.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.cog.diamond
+diamond blastp -q ${FAA} -p ${THREADS} -d eggnog.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.cog.diamond
 """
 
 }
@@ -239,13 +269,14 @@ publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.pfam.hmm'
 
 input:
 file "FAA" from prokka_ch_4
+file "Pfam-A.hmm*" from pfamdb_ch
 
 output:
 file ("annotation.pfam.hmm")
 
 script:
 """
-hmmsearch --domtblout annotation.pfam.hmm -E ${evaluehmmer5} --cpu ${THREADS} ${DBFOLDER}/Pfam-A.hmm ${FAA}
+hmmsearch --domtblout annotation.pfam.hmm -E ${evaluehmmer5} --cpu ${THREADS} Pfam-A.hmm ${FAA}
 """
 }
 
