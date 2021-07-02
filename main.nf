@@ -269,7 +269,7 @@ publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.pfam.hmm'
 
 input:
 file "FAA" from prokka_ch_4
-file "Pfam-A.hmm" "Pfam-A.hmm.dat" from pfamdb_ch
+file "Pfam-A.hmm", "Pfam-A.hmm.dat" from pfamdb_ch
 
 output:
 file ("annotation.pfam.hmm")
