@@ -92,7 +92,8 @@ process getPfamADb {
 storeDir "$CACHEDIR"
 
 output:
-file 'Pfam-A.hmm*' into pfamdb_ch
+file 'Pfam-A.hmm' into pfamdb_ch
+file 'Pfam-A.hmm' into pfamdatdb_ch
 
 script:
 """
@@ -269,7 +270,8 @@ publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.pfam.hmm'
 
 input:
 file "FAA" from prokka_ch_4
-file "Pfam-A.hmm", "Pfam-A.hmm.dat" from pfamdb_ch
+file "Pfam-A.hmm" from pfamdb_ch
+file "Pfam-A.hmm.dat" from pfamdatdb_ch
 
 output:
 file ("annotation.pfam.hmm")
