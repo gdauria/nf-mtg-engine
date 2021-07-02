@@ -224,7 +224,7 @@ publishDir "${BASENAME}/annotation", mode: 'copy', pattern: '*.diamond'
 
 input:
 file "FAA" from prokka_ch_1
-/* file "KEGGDB" from keggdb_ch */
+file "keggdb.dmnd" from keggdb_ch 
 
 output:
 file ("annotation.kegg.diamond") into kegg_channel
@@ -232,7 +232,7 @@ file ("annotation.kegg.diamond") into kegg_channel
 script:
 """
 # KO
-diamond blastp -q ${FAA} -p ${THREADS} -d ${KEGGDB} -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.kegg.diamond
+diamond blastp -q ${FAA} -p ${THREADS} -d keggdb.dmnd -e $evaluefun4 --id $minidenfun4 --quiet -b $blocksize -f 6 qseqid qlen sseqid slen pident length evalue bitscore qstart qend sstart send -o annotation.kegg.diamond
 """
 
 }
